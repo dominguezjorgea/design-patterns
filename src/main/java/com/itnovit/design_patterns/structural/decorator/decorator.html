@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Decorator Pattern</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+        }
+        code {
+            display: block;
+            background: #f4f4f4;
+            padding: 10px;
+            border-radius: 5px;
+            margin: 10px 0;
+            overflow-x: auto;
+        }
+        h1 {
+            color: #4CAF50;
+        }
+        h2 {
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+<h1>Decorator Pattern Example Using the User Case</h1>
+<p>The <strong>Decorator Pattern</strong> dynamically adds new functionality or behavior to an object without altering its structure. It uses a set of decorator classes that wrap around the concrete components.</p>
+
+<h2>Scenario</h2>
+<ul>
+    <li>We have a <strong>User</strong> object with basic details such as name and email.</li>
+    <li>We want to add additional functionalities like logging user details and encrypting sensitive information without modifying the <strong>User</strong> class.</li>
+    <li>The <strong>Decorator Pattern</strong> allows us to achieve this dynamically.</li>
+</ul>
+
+<h2>Code Example</h2>
+
+<h3>1. Component Interface</h3>
+<p>Defines the base functionality that all decorators and the core component must implement.</p>
+<code>
+    public interface User {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;String getDetails();<br>
+    }
+</code>
+
+<h3>2. Concrete Component</h3>
+<p>The core implementation of the <strong>User</strong> interface.</p>
+<code>
+    public class BasicUser implements User {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;private String name;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;private String email;<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;public BasicUser(String name, String email) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.name = name;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.email = email;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;@Override<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;public String getDetails() {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "Name: " + name + ", Email: " + email;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+    }
+</code>
+
+<h3>3. Base Decorator</h3>
+<p>Defines a wrapper around the component.</p>
+<code>
+    public abstract class UserDecorator implements User {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;protected User decoratedUser;<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;public UserDecorator(User decoratedUser) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;this.decoratedUser = decoratedUser;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;@Override<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;public String getDetails() {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return decoratedUser.getDetails();<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+    }
+</code>
+
+<h3>4. Concrete Decorators</h3>
+<p>Add additional behavior dynamically.</p>
+
+<h4>Logging Decorator:</h4>
+<code>
+    public class LoggingUserDecorator extends UserDecorator {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;public LoggingUserDecorator(User decoratedUser) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;super(decoratedUser);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;@Override<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;public String getDetails() {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String details = super.getDetails();<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("Logging user details: " + details);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return details;<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+    }
+</code>
+
+<h4>Encryption Decorator:</h4>
+<code>
+    import java.util.Base64;<br><br>
+
+    public class EncryptedUserDecorator extends UserDecorator {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;public EncryptedUserDecorator(User decoratedUser) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;super(decoratedUser);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;@Override<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;public String getDetails() {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;String details = super.getDetails();<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;return "Encrypted: " + Base64.getEncoder().encodeToString(details.getBytes());<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+    }
+</code>
+
+<h3>5. Client</h3>
+<p>Demonstrates the usage of the <strong>Decorator Pattern</strong>.</p>
+<code>
+    public class Main {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;public static void main(String[] args) {<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Base User<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User basicUser = new BasicUser("John Doe", "john.doe@example.com");<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Add logging functionality<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User loggedUser = new LoggingUserDecorator(basicUser);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("Logged User: " + loggedUser.getDetails());<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Add encryption functionality<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User encryptedUser = new EncryptedUserDecorator(basicUser);<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("Encrypted User: " + encryptedUser.getDetails());<br><br>
+
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;// Combine logging and encryption<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;User loggedAndEncryptedUser = new LoggingUserDecorator(new EncryptedUserDecorator(basicUser));<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;System.out.println("Logged and Encrypted User: " + loggedAndEncryptedUser.getDetails());<br>
+    &nbsp;&nbsp;&nbsp;&nbsp;}<br>
+    }
+</code>
+
+<h2>Output</h2>
+<pre>
+        Logging user details: Name: John Doe, Email: john.doe@example.com
+        Logged User: Name: John Doe, Email: john.doe@example.com
+        Encrypted User: Encrypted: TmFtZTogSm9obiBEb2UsIEVtYWlsOiBqb2huLmRvZUBleGFtcGxlLmNvbQ==
+        Logging user details: Encrypted: TmFtZTogSm9obiBEb2UsIEVtYWlsOiBqb2huLmRvZUBleGFtcGxlLmNvbQ==
+        Logged and Encrypted User: Encrypted: TmFtZTogSm9obiBEb2UsIEVtYWlsOiBqb2huLmRvZUBleGFtcGxlLmNvbQ==
+    </pre>
+
+<h2>Key Components</h2>
+<ul>
+    <li><strong>Component Interface</strong>: Defines the structure all decorators and the base component must follow.</li>
+    <li><strong>Concrete Component</strong>: Provides the default behavior (BasicUser).</li>
+    <li><strong>Base Decorator</strong>: Serves as a wrapper around the component.</li>
+    <li><strong>Concrete Decorators</strong>: Add additional behavior dynamically (e.g., LoggingUserDecorator and EncryptedUserDecorator).</li>
+    <li><strong>Client</strong>: Uses the decorators transparently, unaware of the additional behavior.</li>
+</ul>
+
+<h2>Benefits</h2>
+<ul>
+    <li>Flexible and reusable design.</li>
+    <li>Extends the functionality of objects without modifying their code.</li>
+    <li>Combines multiple decorators dynamically at runtime.</li>
+</ul>
+</body>
+</html>

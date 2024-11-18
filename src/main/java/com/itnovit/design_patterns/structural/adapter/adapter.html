@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adapter Pattern - User Example</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            margin: 20px;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+        }
+
+        h1, h2, h3 {
+            color: #444;
+        }
+
+        pre {
+            background-color: #efefef;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+
+        code {
+            font-family: "Courier New", Courier, monospace;
+            color: #d14;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        .output {
+            background: #f4f4f4;
+            border-left: 4px solid #4CAF50;
+            padding: 10px;
+            font-style: italic;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>Adapter Pattern Example Using the User Case</h1>
+    <p>The Adapter Pattern is used to bridge two incompatible interfaces so that a class can work with another class that it doesn't directly support.</p>
+
+    <h2>Scenario</h2>
+    <p>
+        We have an existing system that uses the <code>User</code> class with methods like <code>getFullName()</code>
+        and <code>getEmail()</code>.
+        <br>
+        A new external library or service uses a class <code>ExternalUser</code> with methods like <code>getName()</code>
+        and <code>getContactInfo()</code>.
+        <br>
+        We need to adapt the <code>ExternalUser</code> class to fit the existing system's <code>User</code> interface without modifying either class.
+    </p>
+
+    <h2>Code Example</h2>
+
+    <h3>1. Target Interface: Define the interface the system expects.</h3>
+    <pre><code class="java">
+public interface User {
+    String getFullName();
+    String getEmail();
+}
+    </code></pre>
+
+    <h3>2. Adaptee: The class that needs to be adapted.</h3>
+    <pre><code class="java">
+public class ExternalUser {
+    private String name;
+    private String contactInfo;
+
+    public ExternalUser(String name, String contactInfo) {
+        this.name = name;
+        this.contactInfo = contactInfo;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getContactInfo() {
+        return contactInfo;
+    }
+}
+    </code></pre>
+
+    <h3>3. Adapter: Bridge between <code>ExternalUser</code> and <code>User</code>.</h3>
+    <pre><code class="java">
+public class UserAdapter implements User {
+    private ExternalUser externalUser;
+
+    public UserAdapter(ExternalUser externalUser) {
+        this.externalUser = externalUser;
+    }
+
+    @Override
+    public String getFullName() {
+        return externalUser.getName();
+    }
+
+    @Override
+    public String getEmail() {
+        return externalUser.getContactInfo();
+    }
+}
+    </code></pre>
+
+    <h3>4. Client: The existing system that uses <code>User</code>.</h3>
+    <pre><code class="java">
+public class UserService {
+    public void printUserDetails(User user) {
+        System.out.println("Full Name: " + user.getFullName());
+        System.out.println("Email: " + user.getEmail());
+    }
+}
+    </code></pre>
+
+    <h3>5. Main Application: Demonstrate the Adapter Pattern.</h3>
+    <pre><code class="java">
+public class Main {
+    public static void main(String[] args) {
+        // ExternalUser instance (Adaptee)
+        ExternalUser externalUser = new ExternalUser("John Doe", "john.doe@example.com");
+
+        // Adapting ExternalUser to User using UserAdapter
+        User userAdapter = new UserAdapter(externalUser);
+
+        // Using the existing UserService with the adapted ExternalUser
+        UserService userService = new UserService();
+        userService.printUserDetails(userAdapter);
+    }
+}
+    </code></pre>
+
+    <h3>Output</h3>
+    <div class="output">
+        Full Name: John Doe<br>
+        Email: john.doe@example.com
+    </div>
+
+    <h2>Explanation of Key Components</h2>
+    <ul>
+        <li><strong>Target Interface (<code>User</code>)</strong>: Defines the methods the system expects (<code>getFullName()</code> and <code>getEmail()</code>).</li>
+        <li><strong>Adaptee (<code>ExternalUser</code>)</strong>: A class with incompatible methods (<code>getName()</code> and <code>getContactInfo()</code>).</li>
+        <li><strong>Adapter (<code>UserAdapter</code>)</strong>: Converts the <code>ExternalUser</code> methods into the methods expected by the <code>User</code> interface.</li>
+        <li><strong>Client (<code>UserService</code>)</strong>: Uses the <code>User</code> interface, unaware that the data is coming from an <code>ExternalUser</code> instance.</li>
+    </ul>
+
+    <h2>Key Benefits</h2>
+    <ul>
+        <li>Promotes reusability by allowing the existing system to work with new or external classes.</li>
+        <li>Avoids modifying either the existing system or the external class.</li>
+    </ul>
+</div>
+</body>
+</html>
